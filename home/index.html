@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Memory Master">
+    <meta property="og:description" content="Color Matcher Extraordinaire">
+    <meta property="og:image" content="https://i.imgur.com/IpfEpQH.png">
+    <link rel="icon" type="image/svg+xml" href="/home/assets/icon.svg" />
     <link rel="stylesheet" href="index.css">
-    <title>Js-Vibe</title>
+    <title>Memory Master</title>
 </head>
-
 <body class="body">
-
+    
     <div class="game-container">
 
-        <button id="revealButton">Reveal Colors</button>
-        <!-- Add a div to display the score -->
-        <div id="score" class="score">Score: 3</div>
-
-        <!-- Add a div to display messages -->
-        <div id="message" class="message-container message" style="display: none;"></div>
-
-        <!-- Grid items -->
-        <div class="game-board">
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
-            <div class="grid-item">1</div>
+            <div id="score" class="score">Score: 0</div>
+ 
+          
+        <div id="message" class="message-container message" style="display: none; cursor: pointer; ">
+            
         </div>
+        <div id="difficulty" class="difficulty">
+            <h1 id="game-message"></h1>
+            <h1 class="difficulty-text" >Choose the difficulty</h1>
+            <div class="difficulty-button-container">
+                <button class="level-button green" id="easy">Easy</button>
+                <button class="level-button yellow" id="medium">Medium</button>
+                <button class="level-button red" id="difficult">Difficult</button>
+            </div>
+            
+           
+        </div>
+        <div class="game-board" id="board"></div>
     </div>
     <script src="index.js"></script>
 </body>
-
 </html>

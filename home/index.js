@@ -1,138 +1,208 @@
-// Array of five different colors
-const colors = ["#FF5733", "#33FF57", "#5733FF", "#FF33E9", "#33E9FF"];
+const easyButton = document.getElementById("easy");
+const mediumButton = document.getElementById("medium");
+const difficultButton = document.getElementById("difficult");
+const choosenWindow = document.getElementById("difficulty");
+const gameBoard = document.getElementById("board");
+const scoreDisplay = document.getElementById("score");
+const messageDisplay = document.getElementById("game-message"); // Add a message display element
 
-// Get all grid items
-const gridItems = document.querySelectorAll(".grid-item");
-const scoreDisplay = document.querySelector(".score"); // Display element for the score
-const messageDisplay = document.querySelector(".message"); // Display element for messages
+let currentLevel = "";
+let score = 3;
+let gameDifficulty = "";
 
-let firstClicked = null; // Store the first clicked element
-let secondClicked = null; // Store the second clicked element
-let matchedPairs = 0; // Counter for matched pairs
-let score = 3; // Starting score
+easyButton.addEventListener("click", () => startGame("easy"));
+mediumButton.addEventListener("click", () => startGame("medium"));
+difficultButton.addEventListener("click", () => startGame("difficult"));
 
-// Variable to track the color of the previously clicked item
-let prevClickedColor = null;
-
-// Shuffle the colors array to randomize the color assignment
-for (let i = colors.length - 1; i > 0; i--) {
-  const j = Math.floor(Math.random() * (i + 1));
-  [colors[i], colors[j]] = [colors[j], colors[i]];
-}
-
-// Update the score display
-function updateScore() {
-  scoreDisplay.textContent = `Score: ${score}`;
-}
-
-// Function to handle the end of the game
-function endGame(message) {
-  messageDisplay.innerHTML = message;
-  messageDisplay.style.display = "flex";
-}
-
-// Add a click event listener to each grid item
-gridItems.forEach((item, index) => {
-  // Initially, hide the color by setting the background to a default color
-  item.style.backgroundColor = "gray";
-
-  item.addEventListener("click", () => {
-    // If the player has already finished the game, do nothing
-    if (matchedPairs === colors.length / 2) {
-      return;
-    }
-
-    // If no element has been clicked yet, store this as the first clicked element
-    if (firstClicked === null) {
-      firstClicked = item;
-      item.style.backgroundColor = colors[index % 5]; // Reveal the color
-    } else if (secondClicked === null && item !== firstClicked) {
-      // If a first element has been clicked and the clicked item is not the same as the first one
-      secondClicked = item;
-      item.style.backgroundColor = colors[index % 5]; // Reveal the color
-
-      // Check if the colors match
-      if (
-        firstClicked.style.backgroundColor ===
-        secondClicked.style.backgroundColor
-      ) {
-        // Colors match, so the elements should stay revealed
-        firstClicked = null;
-        secondClicked = null;
-        matchedPairs++;
-        prevClickedColor = null;
-
-        // Check if the player has matched all pairs
-        if (matchedPairs === colors.length / 2) {
-          endGame("Congratulations! You won the game.");
-        }
-      } else {
-        // Colors don't match, so reset both clicked elements after a delay
-        setTimeout(() => {
-          firstClicked.style.backgroundColor = "gray";
-          secondClicked.style.backgroundColor = "gray";
-          firstClicked = null;
-          secondClicked = null;
-          prevClickedColor = null;
-          score--;
-          updateScore();
-
-          // Check if the player has lost all points
-          if (score === 0) {
-            endGame(
-              '<div style="display: flex; align-items: center; justify-content: center;"><h1>Game over! You lost.</h1><h1 style="color: red;">Click to play again.</h1></div>'
-            );
-          }
-        }, 500); // Delayed reset to hide the colors again
-      }
-
-      // Check if the current click has the same color as the previous click
-      if (item.style.backgroundColor === prevClickedColor) {
-        score++; // Earn 1 point for matching the same color twice in a row
-        updateScore();
-      }
-      prevClickedColor = item.style.backgroundColor;
-    }
-  });
-});
-
-// Reset the game when the player clicks on the message display to play again
-messageDisplay.addEventListener("click", () => {
+const hideColors = () => {
+  const gridItems = document.querySelectorAll(".grid-item");
   gridItems.forEach((item) => {
-    item.style.backgroundColor = "gray";
+    item.style.backgroundColor = "gray"; // Hide colors
+  });
+};
+
+const showColorsForDuration = (duration) => {
+  const gridItems = document.querySelectorAll(".grid-item");
+  gridItems.forEach((item) => {
+    item.style.backgroundColor = item.dataset.color; // Show color
   });
 
-  // Shuffle the colors array again
-  for (let i = colors.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [colors[i], colors[j]] = [colors[j], colors[i]];
+  // Hide colors after the specified duration
+  setTimeout(() => {
+    hideColors();
+  }, duration);
+};
+
+const startGame = (level) => {
+  scoreDisplay.textContent = `Score: ${score}`;
+  currentLevel = level;
+  let elementCount = 0;
+  let colorPairs = [];
+
+  let elementShowDuration = 0;
+
+  if (level === "easy") {
+    elementCount = 6;
+    elementShowDuration = 2000;
+    gameDifficulty = "easy";
+  } else if (level === "medium") {
+    elementCount = 10;
+    elementShowDuration = 3000;
+    gameDifficulty = "medium";
+  } else {
+    elementShowDuration = 5000;
+    elementCount = 20;
+    gameDifficulty = "difficult";
   }
 
-  // Reset variables
-  firstClicked = null;
-  secondClicked = null;
-  matchedPairs = 0;
-  score = 3;
-  prevClickedColor = null;
+  // Generate random colors for the grid
+  for (let i = 0; i < elementCount / 2; i++) {
+    const randomColor = generateRandomColor();
+    colorPairs.push(randomColor, randomColor); // Add two identical colors
+  }
 
-  updateScore();
-  messageDisplay.style.display = "none";
-});
+  colorPairs = shuffleArray(colorPairs); // Shuffle the color pairs
 
-const revealButton = document.getElementById("revealButton");
+  gameBoard.innerHTML = ""; // Clear the game board
 
-revealButton.addEventListener("click", () => {
-  gridItems.forEach((item, index) => {
-    item.style.backgroundColor = colors[index % 5];
-  });
+  for (let i = 0; i < elementCount; i++) {
+    const gridItem = document.createElement("div");
+    gridItem.classList.add("grid-item");
 
-  revealButton.style.display = "none";
+    // Assign colors from the shuffled array and store them in a data attribute
+    gridItem.dataset.color = colorPairs[i];
+    gridItem.style.backgroundColor = "gray"; // Initially hide colors
 
-  setTimeout(() => {
-    gridItems.forEach((item) => {
-      item.style.backgroundColor = "gray";
+    gridItem.addEventListener("click", () => {
+      handleGridItemClick(gridItem);
     });
 
-    revealButton.style.display = "block";
-  }, 2000);
-});
+    gameBoard.appendChild(gridItem);
+  }
+
+  choosenWindow.style.display = "none";
+
+  // Show colors for 2 seconds at the start of the game
+
+  showColorsForDuration(elementShowDuration);
+};
+
+let firstClickedItem = null;
+
+// Add a variable to keep track of the remaining open elements
+let remainingOpenElements = 0;
+
+// Modify the handleGridItemClick function
+function handleGridItemClick(item) {
+  if (remainingOpenElements >= 2 || item.style.backgroundColor !== "gray") {
+    return; // Limit the number of open elements
+  }
+
+  item.style.backgroundColor = item.dataset.color; // Show color
+  remainingOpenElements++;
+
+  if (!firstClickedItem) {
+    firstClickedItem = item;
+  } else if (firstClickedItem !== item) {
+    if (firstClickedItem.style.backgroundColor === item.style.backgroundColor) {
+      // Colors match, keep the elements visible
+      firstClickedItem = null;
+      remainingOpenElements = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+
+      // Check if all elements are visible
+      if (areAllElementsVisible()) {
+        choosenWindow.style.display = "flex";
+        messageDisplay.innerText = "You're welcome! \u{1F44D}";
+        messageDisplay.style.color = "#6F9CEB";
+        score = 3;
+      }
+    } else {
+      // Colors do not match, hide them again after half a second
+      setTimeout(() => {
+        firstClickedItem.style.backgroundColor = "gray";
+        item.style.backgroundColor = "gray";
+        firstClickedItem = null;
+        remainingOpenElements = 0;
+        score--; // Deduct 1 point for wrong colors
+        scoreDisplay.textContent = `Score: ${score}`;
+
+        // Check if the score is 0, display game-over message
+        switch (true) {
+          case score === 0 && gameDifficulty === "easy":
+            console.log(gameDifficulty);
+            choosenWindow.style.display = "flex";
+            messageDisplay.innerText = "Hahaha you lost! 👎";
+            messageDisplay.style.color = "#D91E36";
+            setTimeout(() => {
+              messageDisplay.innerText = "Sorry for the bullying";
+            }, 1000);
+            setTimeout(() => {
+              messageDisplay.innerText = "Looser \u{1F92A}";
+            }, 3000);
+            score = 3;
+            break;
+
+          case score === 0 && gameDifficulty === "medium":
+            console.log("ceeeeck");
+            choosenWindow.style.display = "flex";
+            messageDisplay.style.color = "#D91E36";
+            messageDisplay.innerText = "You Loose \u{1F625}";
+            score = 3;
+            break;
+
+          case score === 0 && gameDifficulty === "difficult":
+            choosenWindow.style.display = "flex";
+            messageDisplay.style.color = "#D91E36";
+            messageDisplay.innerText =
+              "Don't give up, you can do it !!! \u{1F608}";
+            score = 3;
+            break;
+
+          default:
+            console.log("check");
+            break;
+        }
+      }, 500);
+    }
+  }
+}
+
+// Function to check if all elements are visible
+function areAllElementsVisible() {
+  const gridItems = document.querySelectorAll(".grid-item");
+  for (const item of gridItems) {
+    if (item.style.backgroundColor === "gray") {
+      return false;
+    }
+  }
+  return true;
+}
+
+function showMessage(message) {
+  console.log(message);
+  messageDisplay.textContent = message;
+  messageDisplay.style.display = "block";
+  restartButton.style.display = "block"; // Show the restart button
+  overlay.style.display = "block"; // Show the transparent overlay
+}
+
+// Function to generate a random color
+function generateRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+// Function to shuffle an array using the Fisher-Yates algorithm
+function shuffleArray(array) {
+  console.log(array);
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
