@@ -132,7 +132,7 @@ function handleGridItemClick(item) {
           case score === 0 && gameDifficulty === "easy":
             console.log(gameDifficulty);
             choosenWindow.style.display = "flex";
-            messageDisplay.innerText = "Hahaha you lost! 👎";
+            messageDisplay.innerText = "Hahaha Game Over! 👎";
             messageDisplay.style.color = "#D91E36";
             setTimeout(() => {
               messageDisplay.innerText = "Sorry for the bullying";

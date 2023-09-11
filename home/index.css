@@ -12,6 +12,16 @@
     background-color: #3A405A;
 }
 
+.info {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    color:#FF5D73;
+    font-weight: 600;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
 .game-board {
     width: 500px;
     height: 500px;
