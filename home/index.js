@@ -94,6 +94,11 @@ let remainingOpenElements = 0;
 
 // Modify the handleGridItemClick function
 function handleGridItemClick(item) {
+  const wrong = new Audio("./assets/sounds/wrong.wav");
+  const right = new Audio("./assets/sounds/right.wav");
+  const loose = new Audio("./assets/sounds/loose.wav");
+  const won = new Audio("./assets/sounds/won.wav");
+
   if (remainingOpenElements >= 2 || item.style.backgroundColor !== "gray") {
     return; // Limit the number of open elements
   }
@@ -109,11 +114,12 @@ function handleGridItemClick(item) {
       firstClickedItem = null;
       remainingOpenElements = 0;
       scoreDisplay.textContent = `Score: ${score}`;
-
+      right.play();
       // Check if all elements are visible
       if (areAllElementsVisible()) {
         choosenWindow.style.display = "flex";
         messageDisplay.innerText = "You're welcome! \u{1F44D}";
+        won.play();
         messageDisplay.style.color = "#6F9CEB";
         score = 3;
       }
@@ -124,13 +130,17 @@ function handleGridItemClick(item) {
         item.style.backgroundColor = "gray";
         firstClickedItem = null;
         remainingOpenElements = 0;
+        wrong.play();
         score--; // Deduct 1 point for wrong colors
         scoreDisplay.textContent = `Score: ${score}`;
+
+        if (score === 0) {
+          loose.play();
+        }
 
         // Check if the score is 0, display game-over message
         switch (true) {
           case score === 0 && gameDifficulty === "easy":
-            console.log(gameDifficulty);
             choosenWindow.style.display = "flex";
             messageDisplay.innerText = "Hahaha Game Over! 👎";
             messageDisplay.style.color = "#D91E36";
@@ -144,7 +154,6 @@ function handleGridItemClick(item) {
             break;
 
           case score === 0 && gameDifficulty === "medium":
-            console.log("ceeeeck");
             choosenWindow.style.display = "flex";
             messageDisplay.style.color = "#D91E36";
             messageDisplay.innerText = "You Loose \u{1F625}";
@@ -180,7 +189,6 @@ function areAllElementsVisible() {
 }
 
 function showMessage(message) {
-  console.log(message);
   messageDisplay.textContent = message;
   messageDisplay.style.display = "block";
   restartButton.style.display = "block"; // Show the restart button
