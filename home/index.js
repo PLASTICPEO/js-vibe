@@ -4,10 +4,12 @@ const difficultButton = document.getElementById("difficult");
 const choosenWindow = document.getElementById("difficulty");
 const gameBoard = document.getElementById("board");
 const scoreDisplay = document.getElementById("score");
+const pointDisplay = document.getElementById("point");
 const messageDisplay = document.getElementById("game-message"); // Add a message display element
 
 let currentLevel = "";
 let score = 3;
+let point = 0;
 let gameDifficulty = "";
 
 easyButton.addEventListener("click", () => startGame("easy"));
@@ -35,6 +37,7 @@ const showColorsForDuration = (duration) => {
 
 const startGame = (level) => {
   scoreDisplay.textContent = `Score: ${score}`;
+  pointDisplay.textContent = `Score: ${point}`;
   currentLevel = level;
   let elementCount = 0;
   let colorPairs = [];
@@ -113,7 +116,10 @@ function handleGridItemClick(item) {
       // Colors match, keep the elements visible
       firstClickedItem = null;
       remainingOpenElements = 0;
+      point += 2.5;
       scoreDisplay.textContent = `Score: ${score}`;
+      pointDisplay.textContent = `Score: ${point}`;
+
       right.play();
       // Check if all elements are visible
       if (areAllElementsVisible()) {
@@ -122,6 +128,7 @@ function handleGridItemClick(item) {
         won.play();
         messageDisplay.style.color = "#6F9CEB";
         score = 3;
+        point = 0;
       }
     } else {
       // Colors do not match, hide them again after half a second
@@ -151,6 +158,7 @@ function handleGridItemClick(item) {
               messageDisplay.innerText = "Looser \u{1F92A}";
             }, 3000);
             score = 3;
+            point = 0;
             break;
 
           case score === 0 && gameDifficulty === "medium":
